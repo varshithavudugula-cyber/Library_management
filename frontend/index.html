@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Library circulation and digital catalog management">
+  <title>Libra — Library Management</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">L</span><span>libra<span class="brand-dot">.</span><small>LIBRARY MANAGEMENT</small></span></a>
+    <nav><a href="#catalog">Catalog</a><a href="#circulation">Circulation</a><a href="#about">About</a></nav>
+    <button id="refreshBtn" class="button button-quiet">↻ Refresh</button>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="live-dot"></span> YOUR CAMPUS LIBRARY, DIGITIZED</span>
+        <h1>Every book has<br><em>a next chapter.</em></h1>
+        <p>Discover books, check availability, and keep circulation organized in one simple place.</p>
+        <a class="button button-dark" href="#catalog">Explore the catalog <span>↘</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun"></div><div class="book book-a"></div><div class="book book-b"></div><div class="book book-c"></div>
+        <div class="art-label">READ · LEARN · RETURN</div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Library statistics">
+      <article><span class="stat-icon">▤</span><div><p>Total titles</p><strong id="totalBooks">—</strong></div></article>
+      <article><span class="stat-icon mint">✓</span><div><p>Available copies</p><strong id="availableBooks">—</strong></div></article>
+      <article><span class="stat-icon peach">↗</span><div><p>Currently issued</p><strong id="issuedBooks">—</strong></div></article>
+      <article><span class="stat-icon lilac">⌁</span><div><p>Overdue loans</p><strong id="overdueBooks">—</strong></div></article>
+    </section>
+
+    <section id="catalog" class="section">
+      <div class="section-heading">
+        <div><span class="eyebrow">THE COLLECTION</span><h2>Find your next read</h2><p class="muted">Search the digital catalog by title, author, ISBN, or category.</p></div>
+        <button id="addBookOpen" class="button button-dark admin-only">＋ Add a book</button>
+      </div>
+      <div class="toolbar">
+        <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Search books, authors, ISBN…" autocomplete="off"></label>
+        <select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select>
+        <select id="availabilityFilter" aria-label="Filter by availability"><option value="">Any availability</option><option value="available">Available now</option><option value="unavailable">Currently unavailable</option></select>
+      </div>
+      <div id="catalogMessage" class="message" role="status"></div>
+      <div id="bookGrid" class="book-grid"></div>
+    </section>
+
+    <section id="circulation" class="section circulation-section">
+      <div class="section-heading"><div><span class="eyebrow">BORROWING DESK</span><h2>Circulation overview</h2><p class="muted">Track active loans, due dates, and returns.</p></div></div>
+      <div class="circulation-layout">
+        <div class="panel">
+          <div class="panel-heading"><h3>Issue a book</h3><span class="panel-symbol">↗</span></div>
+          <form id="issueForm">
+            <label>Book<select id="issueBookId" required><option value="">Choose an available book</option></select></label>
+            <label>Borrower name<input id="borrowerName" maxlength="100" required placeholder="e.g. Kundana"></label>
+            <label>Borrower ID<input id="borrowerId" maxlength="50" required placeholder="e.g. 26RH1A0001"></label>
+            <label>Due date<input id="dueDate" type="date" required></label>
+            <button class="button button-dark full" type="submit">Issue book <span>→</span></button>
+            <p class="form-note">Demo mode lets you try the workflow locally. Connect Supabase for persistent shared data.</p>
+          </form>
+        </div>
+        <div class="panel loans-panel">
+          <div class="panel-heading"><h3>Active loans</h3><span id="loanCount" class="count-pill">0 loans</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Book / Borrower</th><th>Due date</th><th>Status</th><th></th></tr></thead><tbody id="loanTable"><tr><td colspan="4" class="empty-cell">Loading loans…</td></tr></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="bottom-note"><div class="note-mark">✳</div><div><h3>A little more reading goes a long way.</h3><p>Keep the catalog accurate, return books on time, and make knowledge easier to find.</p></div><span class="note-decoration">LIBRARY / 01</span></section>
+  </main>
+  <footer><span>LIBRA © <span id="year"></span></span><span>Library Circulation & Digital Catalog Management System</span><span id="connectionStatus" class="connection-status">Connecting…</span></footer>
+
+  <dialog id="bookDialog" class="dialog">
+    <form id="bookForm" method="dialog">
+      <div class="dialog-heading"><div><span class="eyebrow">COLLECTION MANAGEMENT</span><h2>Add a book</h2></div><button type="button" class="close-btn" id="closeBookDialog" aria-label="Close">×</button></div>
+      <label>Book title<input id="bookTitle" required maxlength="200" placeholder="Title of the book"></label>
+      <div class="form-row"><label>Author<input id="bookAuthor" required maxlength="150" placeholder="Author name"></label><label>Category<input id="bookCategory" required maxlength="80" placeholder="e.g. Technology"></label></div>
+      <div class="form-row"><label>ISBN (optional)<input id="bookIsbn" maxlength="30" placeholder="ISBN"></label><label>Total copies<input id="bookCopies" type="number" min="1" max="500" value="1" required></label></div>
+      <label>Description (optional)<textarea id="bookDescription" rows="3" maxlength="1000" placeholder="A short description"></textarea></label>
+      <p class="form-note">This demo includes simple catalog management. For a real deployment, protect management actions with administrator authentication.</p>
+      <div class="dialog-actions"><button type="button" id="cancelBook" class="button button-quiet">Cancel</button><button class="button button-dark" type="submit">Save book →</button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
